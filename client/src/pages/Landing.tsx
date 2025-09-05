@@ -77,8 +77,8 @@ export default function Landing() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Premium Hero Banner */}
-      <section className="relative hero-gradient py-32 overflow-hidden">
+      {/* Ultra-Premium Hero Banner */}
+      <section className="hero-ultra-gradient py-20 lg:py-32 overflow-hidden relative">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-transparent to-emerald-500/10"></div>
           <div className="absolute top-20 left-20 w-96 h-96 bg-violet-500/5 rounded-full blur-3xl animate-float"></div>
@@ -93,27 +93,27 @@ export default function Landing() {
                 <span className="text-sm font-medium text-violet-200">World-Class Premium Templates</span>
               </div>
               
-              <h1 className="text-6xl md:text-7xl font-bold leading-tight text-glow">
+              <h1 className="text-ultra-hero text-glow-ultra mb-6 animate-pulse-glow-ultra">
                 Premium <span className="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">Template</span>
                 <br />
                 Marketplace
               </h1>
               
-              <p className="text-xl text-white/70 max-w-lg leading-relaxed">
+              <p className="text-lg md:text-xl text-white/70 max-w-xl leading-relaxed mb-8">
                 Discover professionally crafted templates designed by world-class designers. 
                 Modern, responsive designs that convert visitors into customers.
               </p>
               
-              {/* Premium Search Bar */}
-              <form onSubmit={handleSearch} className="search-premium">
+              {/* Ultra-Premium Search Bar */}
+              <form onSubmit={handleSearch} className="search-ultra-premium mb-8">
                 <Search className="search-icon" />
                 <input
                   type="text"
-                  placeholder="Search templates, categories, or tags..."
+                  placeholder="Search premium templates, categories, or tags..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <Button type="submit" className="search-button btn-premium">
+                <Button type="submit" className="search-button btn-ultra-premium">
                   <Zap className="w-4 h-4 mr-2" />
                   Search
                 </Button>
@@ -122,12 +122,12 @@ export default function Landing() {
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link href="/templates">
-                  <Button className="btn-premium">
+                  <Button className="btn-ultra-premium text-base px-8 py-4">
                     <Sparkles className="w-5 h-5 mr-2" />
                     Browse Templates
                   </Button>
                 </Link>
-                <Button className="btn-secondary-premium">
+                <Button className="btn-ghost-premium text-base px-8 py-4">
                   <Award className="w-5 h-5 mr-2" />
                   See Pricing
                 </Button>
@@ -136,28 +136,29 @@ export default function Landing() {
 
             {/* Hero Template Showcase */}
             {heroTemplate && (
-              <div className="relative">
-                <div className="relative template-card-premium p-0 animate-pulse-glow">
+              <div className="relative hidden lg:block">
+                <div className="template-card-ultra animate-pulse-glow-ultra float-element">
                   <div className="image-container">
                     <img 
                       src={heroTemplate.previewImages?.[0] || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop"}
                       alt={heroTemplate.name}
                       className="w-full h-80 object-cover"
                     />
-                    <div className="absolute top-4 right-4">
-                      <span className="badge-price">
+                    <div className="overlay"></div>
+                    <div className="absolute top-6 right-6">
+                      <span className="badge-price-ultra">
                         ${heroTemplate.price}
                       </span>
                     </div>
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-bold mb-2 text-white">{heroTemplate.name}</h3>
-                    <p className="text-white/70 text-sm mb-4">{heroTemplate.shortDescription}</p>
-                    <div className="flex gap-2">
-                      <Button size="sm" className="btn-premium flex-1">
+                    <h3 className="text-xl font-bold mb-3 text-white">{heroTemplate.name}</h3>
+                    <p className="text-white/70 text-sm mb-4 leading-relaxed">{heroTemplate.shortDescription}</p>
+                    <div className="template-actions">
+                      <Button className="btn-ghost-premium flex-1">
                         View Demo
                       </Button>
-                      <Button size="sm" className="btn-secondary-premium">
+                      <Button className="btn-ultra-premium flex-1">
                         Buy Now
                       </Button>
                     </div>
@@ -189,7 +190,7 @@ export default function Landing() {
                 </Button>
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid-ultra-responsive">
               {featuredTemplates.map((template) => (
                 <TemplateCard key={template.id} template={template} />
               ))}
@@ -218,7 +219,7 @@ export default function Landing() {
                 </Button>
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid-ultra-responsive">
               {bestSellingTemplates.map((template) => (
                 <TemplateCard key={template.id} template={template} />
               ))}
@@ -247,7 +248,7 @@ export default function Landing() {
                 </Button>
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid-ultra-responsive">
               {latestTemplates.map((template) => (
                 <TemplateCard key={template.id} template={template} />
               ))}
@@ -281,7 +282,7 @@ export default function Landing() {
                 </Button>
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid-ultra-responsive">
               {trendingTemplates.map((template) => (
                 <TemplateCard key={template.id} template={template} />
               ))}
@@ -311,7 +312,7 @@ export default function Landing() {
                 </Button>
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid-ultra-responsive">
               {discountTemplates.map((template) => (
                 <TemplateCard key={template.id} template={template} />
               ))}
@@ -340,7 +341,7 @@ export default function Landing() {
                 </Button>
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid-ultra-responsive">
               {customerFavorites.map((template) => (
                 <TemplateCard key={template.id} template={template} />
               ))}

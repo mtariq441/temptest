@@ -99,7 +99,7 @@ export default function TemplateCard({ template }: TemplateCardProps) {
   };
 
   return (
-    <div className="template-card-premium group">
+    <div className="template-card-ultra group gpu-optimized">
       {/* Image Container with Hover Effects */}
       <div className="image-container relative">
         <Link href={`/template/${template.slug}`}>
@@ -133,7 +133,7 @@ export default function TemplateCard({ template }: TemplateCardProps) {
         
         {/* Price Badge */}
         <div className="absolute top-4 right-4">
-          <span className="badge-price">
+          <span className="badge-price-ultra">
             ${template.price}
           </span>
         </div>
@@ -161,11 +161,11 @@ export default function TemplateCard({ template }: TemplateCardProps) {
           
           {/* Rating */}
           <div className="flex items-center justify-between">
-            <div className="rating-stars">
+            <div className="rating-ultra">
               {Array.from({ length: 5 }, (_, i) => (
                 <Star 
                   key={i} 
-                  className={`rating-star ${i < Math.floor(template.avgRating || 0) ? '' : 'empty'}`}
+                  className={`rating-star-ultra ${i < Math.floor(template.avgRating || 0) ? '' : 'empty'}`}
                 />
               ))}
               <span className="text-sm text-white/60 ml-2" data-testid={`text-rating-${template.id}`}>
@@ -183,21 +183,21 @@ export default function TemplateCard({ template }: TemplateCardProps) {
         {/* Tags */}
         <div className="flex flex-wrap gap-2">
           {template.category && (
-            <span className="badge-premium">
+            <span className="badge-ultra-premium">
               {template.category.name}
             </span>
           )}
           {template.tags?.slice(0, 2).map((tag: string) => (
-            <span key={tag} className="badge-premium">
+            <span key={tag} className="badge-ultra-premium">
               {tag}
             </span>
           ))}
         </div>
         
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="template-actions">
           <Button 
-            className="btn-secondary-premium flex-1 text-sm" 
+            className="btn-ghost-premium flex-1" 
             size="sm"
             onClick={handlePreview}
             data-testid={`button-preview-${template.id}`}
@@ -206,7 +206,7 @@ export default function TemplateCard({ template }: TemplateCardProps) {
             Preview
           </Button>
           <Button 
-            className="btn-premium flex-1 text-sm" 
+            className="btn-ultra-premium flex-1" 
             size="sm"
             onClick={addToCart}
             disabled={isAddingToCart}
