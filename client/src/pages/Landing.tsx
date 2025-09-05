@@ -6,7 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Star, Search, ArrowRight, Tag, TrendingUp, Clock, Heart, Percent } from "lucide-react";
+import { 
+  Star, 
+  Search, 
+  ArrowRight, 
+  Tag, 
+  TrendingUp, 
+  Clock, 
+  Heart, 
+  Percent,
+  Sparkles,
+  Zap,
+  Crown,
+  Award,
+  Mail
+} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import type { Template, Category } from "@shared/schema";
@@ -63,67 +77,90 @@ export default function Landing() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Banner - Large Featured Template Slider */}
-      <section className="relative bg-gradient-to-br from-primary/10 to-accent/10 py-20 overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <Badge variant="secondary" className="w-fit">
-                <Star className="w-4 h-4 mr-2 fill-current text-yellow-500" />
-                Featured Template
-              </Badge>
-              <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-                {heroTemplate ? (
-                  <>Premium <span className="text-primary">{heroTemplate.name}</span> Template</>
-                ) : (
-                  <>Premium <span className="text-primary">Website</span> Templates</>
-                )}
+      {/* Premium Hero Banner */}
+      <section className="relative hero-gradient py-32 overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-transparent to-emerald-500/10"></div>
+          <div className="absolute top-20 left-20 w-96 h-96 bg-violet-500/5 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }}></div>
+        </div>
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500/20 to-indigo-500/20 border border-violet-500/20 rounded-full backdrop-blur-sm">
+                <Crown className="w-4 h-4 text-violet-300" />
+                <span className="text-sm font-medium text-violet-200">World-Class Premium Templates</span>
+              </div>
+              
+              <h1 className="text-6xl md:text-7xl font-bold leading-tight text-glow">
+                Premium <span className="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">Template</span>
+                <br />
+                Marketplace
               </h1>
-              <p className="text-xl text-muted-foreground max-w-lg">
-                {heroTemplate?.description || "Discover professionally crafted templates for your next project. Modern designs that convert visitors into customers."}
+              
+              <p className="text-xl text-white/70 max-w-lg leading-relaxed">
+                Discover professionally crafted templates designed by world-class designers. 
+                Modern, responsive designs that convert visitors into customers.
               </p>
               
-              {/* Search Bar */}
-              <form onSubmit={handleSearch} className="flex gap-2 max-w-lg">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <Input
-                    type="text"
-                    placeholder="Search templates, categories, tags..."
-                    className="pl-10"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                <Button type="submit">Search</Button>
+              {/* Premium Search Bar */}
+              <form onSubmit={handleSearch} className="search-premium">
+                <Search className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search templates, categories, or tags..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <Button type="submit" className="search-button btn-premium">
+                  <Zap className="w-4 h-4 mr-2" />
+                  Search
+                </Button>
               </form>
 
-              {heroTemplate && (
-                <div className="flex gap-4 pt-4">
-                  <Button size="lg" className="px-8">
-                    <Link href={heroTemplate.demoUrl || "#"}>
-                      View Demo
-                    </Link>
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Link href="/templates">
+                  <Button className="btn-premium">
+                    <Sparkles className="w-5 h-5 mr-2" />
+                    Browse Templates
                   </Button>
-                  <Button size="lg" variant="outline" className="px-8">
-                    Buy Now - ${heroTemplate.price}
-                  </Button>
-                </div>
-              )}
+                </Link>
+                <Button className="btn-secondary-premium">
+                  <Award className="w-5 h-5 mr-2" />
+                  See Pricing
+                </Button>
+              </div>
             </div>
 
+            {/* Hero Template Showcase */}
             {heroTemplate && (
               <div className="relative">
-                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                  <img 
-                    src={heroTemplate.previewImages?.[0] || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop"}
-                    alt={heroTemplate.name}
-                    className="w-full h-96 object-cover"
-                  />
-                  <div className="absolute top-4 right-4">
-                    <Badge className="bg-green-500 text-white">
-                      ${heroTemplate.price}
-                    </Badge>
+                <div className="relative template-card-premium p-0 animate-pulse-glow">
+                  <div className="image-container">
+                    <img 
+                      src={heroTemplate.previewImages?.[0] || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop"}
+                      alt={heroTemplate.name}
+                      className="w-full h-80 object-cover"
+                    />
+                    <div className="absolute top-4 right-4">
+                      <span className="badge-price">
+                        ${heroTemplate.price}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold mb-2 text-white">{heroTemplate.name}</h3>
+                    <p className="text-white/70 text-sm mb-4">{heroTemplate.shortDescription}</p>
+                    <div className="flex gap-2">
+                      <Button size="sm" className="btn-premium flex-1">
+                        View Demo
+                      </Button>
+                      <Button size="sm" className="btn-secondary-premium">
+                        Buy Now
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -134,20 +171,25 @@ export default function Landing() {
 
       {/* Featured Templates Section */}
       {featuredTemplates.length > 0 && (
-        <section className="py-16 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="flex justify-between items-center mb-8">
-              <div className="flex items-center gap-3">
-                <Star className="w-6 h-6 text-yellow-500 fill-current" />
-                <h2 className="text-3xl font-bold">Featured Templates</h2>
+        <section className="py-20 section-premium">
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="flex justify-between items-center mb-12">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-violet-500/20 to-indigo-500/20 rounded-xl flex items-center justify-center border border-violet-500/20">
+                  <Star className="w-6 h-6 text-violet-300 fill-current" />
+                </div>
+                <div>
+                  <h2 className="text-4xl font-bold text-white mb-2">Featured Templates</h2>
+                  <p className="text-white/60">Hand-picked premium designs</p>
+                </div>
               </div>
               <Link href="/templates?featured=true">
-                <Button variant="ghost" className="flex items-center gap-2">
-                  View All <ArrowRight className="w-4 h-4" />
+                <Button className="btn-secondary-premium">
+                  View All <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredTemplates.map((template) => (
                 <TemplateCard key={template.id} template={template} />
               ))}
@@ -158,20 +200,25 @@ export default function Landing() {
 
       {/* Best Selling Templates Section */}
       {bestSellingTemplates.length > 0 && (
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="flex justify-between items-center mb-8">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="w-6 h-6 text-green-500" />
-                <h2 className="text-3xl font-bold">Best Selling Templates</h2>
+        <section className="py-20 section-premium">
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="flex justify-between items-center mb-12">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-xl flex items-center justify-center border border-emerald-500/20">
+                  <TrendingUp className="w-6 h-6 text-emerald-300" />
+                </div>
+                <div>
+                  <h2 className="text-4xl font-bold text-white mb-2">Best Selling Templates</h2>
+                  <p className="text-white/60">Most popular among creators</p>
+                </div>
               </div>
               <Link href="/templates?sort=popular">
-                <Button variant="ghost" className="flex items-center gap-2">
-                  View All <ArrowRight className="w-4 h-4" />
+                <Button className="btn-secondary-premium">
+                  View All <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {bestSellingTemplates.map((template) => (
                 <TemplateCard key={template.id} template={template} />
               ))}
@@ -182,20 +229,25 @@ export default function Landing() {
 
       {/* Latest Templates Section */}
       {latestTemplates.length > 0 && (
-        <section className="py-16 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="flex justify-between items-center mb-8">
-              <div className="flex items-center gap-3">
-                <Clock className="w-6 h-6 text-blue-500" />
-                <h2 className="text-3xl font-bold">Latest Templates</h2>
+        <section className="py-20 section-premium">
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="flex justify-between items-center mb-12">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center border border-blue-500/20">
+                  <Clock className="w-6 h-6 text-blue-300" />
+                </div>
+                <div>
+                  <h2 className="text-4xl font-bold text-white mb-2">Latest Templates</h2>
+                  <p className="text-white/60">Fresh designs just released</p>
+                </div>
               </div>
               <Link href="/templates?sort=newest">
-                <Button variant="ghost" className="flex items-center gap-2">
-                  View All <ArrowRight className="w-4 h-4" />
+                <Button className="btn-secondary-premium">
+                  View All <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {latestTemplates.map((template) => (
                 <TemplateCard key={template.id} template={template} />
               ))}
@@ -205,26 +257,31 @@ export default function Landing() {
       )}
 
       {/* Category Sections */}
-      {categories.map((category) => (
-        <CategorySection key={category.id} category={category} />
+      {categories.map((category, index) => (
+        <CategorySection key={category.id} category={category} index={index} />
       ))}
 
       {/* Trending Templates Section */}
       {trendingTemplates.length > 0 && (
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="flex justify-between items-center mb-8">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="w-6 h-6 text-purple-500" />
-                <h2 className="text-3xl font-bold">Trending Templates</h2>
+        <section className="py-20 section-premium">
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="flex justify-between items-center mb-12">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl flex items-center justify-center border border-purple-500/20">
+                  <TrendingUp className="w-6 h-6 text-purple-300" />
+                </div>
+                <div>
+                  <h2 className="text-4xl font-bold text-white mb-2">Trending Templates</h2>
+                  <p className="text-white/60">What's hot right now</p>
+                </div>
               </div>
-              <Link href="/templates?sort=rating">
-                <Button variant="ghost" className="flex items-center gap-2">
-                  View All <ArrowRight className="w-4 h-4" />
+              <Link href="/templates?sort=trending">
+                <Button className="btn-secondary-premium">
+                  View All <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {trendingTemplates.map((template) => (
                 <TemplateCard key={template.id} template={template} />
               ))}
@@ -233,22 +290,28 @@ export default function Landing() {
         </section>
       )}
 
-      {/* Discount Templates Section */}
+      {/* Special Offers Section */}
       {discountTemplates.length > 0 && (
-        <section className="py-16 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20">
-          <div className="container mx-auto px-4">
-            <div className="flex justify-between items-center mb-8">
-              <div className="flex items-center gap-3">
-                <Percent className="w-6 h-6 text-red-500" />
-                <h2 className="text-3xl font-bold">Special Offers</h2>
+        <section className="py-20 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-orange-500/5 to-yellow-500/10"></div>
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="flex justify-between items-center mb-12">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-xl flex items-center justify-center border border-red-500/20">
+                  <Percent className="w-6 h-6 text-red-300" />
+                </div>
+                <div>
+                  <h2 className="text-4xl font-bold text-white mb-2">Special Offers</h2>
+                  <p className="text-white/60">Limited time deals</p>
+                </div>
               </div>
               <Link href="/templates?discount=true">
-                <Button variant="ghost" className="flex items-center gap-2">
-                  View All <ArrowRight className="w-4 h-4" />
+                <Button className="btn-secondary-premium">
+                  View All <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {discountTemplates.map((template) => (
                 <TemplateCard key={template.id} template={template} />
               ))}
@@ -259,20 +322,25 @@ export default function Landing() {
 
       {/* Customer Favorites Section */}
       {customerFavorites.length > 0 && (
-        <section className="py-16 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="flex justify-between items-center mb-8">
-              <div className="flex items-center gap-3">
-                <Heart className="w-6 h-6 text-red-500 fill-current" />
-                <h2 className="text-3xl font-bold">Customer Favorites</h2>
+        <section className="py-20 section-premium">
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="flex justify-between items-center mb-12">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-rose-500/20 to-pink-500/20 rounded-xl flex items-center justify-center border border-rose-500/20">
+                  <Heart className="w-6 h-6 text-rose-300 fill-current" />
+                </div>
+                <div>
+                  <h2 className="text-4xl font-bold text-white mb-2">Customer Favorites</h2>
+                  <p className="text-white/60">Highest rated templates</p>
+                </div>
               </div>
               <Link href="/templates?sort=rating">
-                <Button variant="ghost" className="flex items-center gap-2">
-                  View All <ArrowRight className="w-4 h-4" />
+                <Button className="btn-secondary-premium">
+                  View All <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {customerFavorites.map((template) => (
                 <TemplateCard key={template.id} template={template} />
               ))}
@@ -281,22 +349,31 @@ export default function Landing() {
         </section>
       )}
 
-      {/* Newsletter CTA */}
-      <section className="py-16 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
-          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-            Get notified about new template releases, special offers, and design trends.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-            <Input 
-              type="email" 
-              placeholder="Enter your email"
-              className="bg-white text-black"
-            />
-            <Button variant="secondary" className="px-8">
-              Subscribe
-            </Button>
+      {/* Premium Newsletter Section */}
+      <section className="newsletter-premium py-20">
+        <div className="container mx-auto px-6 text-center relative z-10">
+          <div className="max-w-2xl mx-auto">
+            <div className="w-16 h-16 bg-gradient-to-br from-violet-500/20 to-indigo-500/20 rounded-2xl flex items-center justify-center border border-violet-500/20 mx-auto mb-6">
+              <Mail className="w-8 h-8 text-violet-300" />
+            </div>
+            <h2 className="text-4xl font-bold text-white mb-4 text-glow">Stay Updated</h2>
+            <p className="text-xl text-white/70 mb-8 leading-relaxed">
+              Get notified about new template releases, exclusive offers, and design trends from world-class creators.
+            </p>
+            <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+              <Input 
+                type="email" 
+                placeholder="Enter your email"
+                className="input-premium flex-1"
+              />
+              <Button type="submit" className="btn-premium">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Subscribe
+              </Button>
+            </form>
+            <p className="text-white/50 text-sm mt-4">
+              Join 50,000+ designers and developers
+            </p>
           </div>
         </div>
       </section>
@@ -306,8 +383,8 @@ export default function Landing() {
   );
 }
 
-// Category Section Component
-function CategorySection({ category }: { category: Category }) {
+// Premium Category Section Component
+function CategorySection({ category, index }: { category: Category; index: number }) {
   const { data: templates = [] } = useQuery<TemplateWithExtras[]>({
     queryKey: [`/api/templates/category/${category.id}`],
     enabled: !!category.id,
@@ -315,21 +392,28 @@ function CategorySection({ category }: { category: Category }) {
 
   if (templates.length === 0) return null;
 
+  const isEven = index % 2 === 0;
+
   return (
-    <section className="py-16 bg-muted/20">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-3">
-            <Tag className="w-6 h-6 text-primary" />
-            <h2 className="text-3xl font-bold">{category.name} Templates</h2>
+    <section className={`py-20 section-premium ${!isEven ? 'bg-white/[0.02]' : ''}`}>
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="flex justify-between items-center mb-12">
+          <div className="flex items-center gap-4">
+            <div className="category-icon-premium">
+              <Tag className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-4xl font-bold text-white mb-2">{category.name}</h2>
+              <p className="text-white/60">{category.description}</p>
+            </div>
           </div>
           <Link href={`/templates?category=${category.id}`}>
-            <Button variant="ghost" className="flex items-center gap-2">
-              View All <ArrowRight className="w-4 h-4" />
+            <Button className="btn-secondary-premium">
+              View All <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {templates.map((template) => (
             <TemplateCard key={template.id} template={template} />
           ))}

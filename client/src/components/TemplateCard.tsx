@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, ShoppingCart, Eye } from "lucide-react";
+import { Star, ShoppingCart, Eye, Heart, Download, Zap, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -23,6 +23,7 @@ interface TemplateCardProps {
     avgRating?: number;
     reviewCount?: number;
     demoUrl?: string | null;
+    downloads?: number | null;
   };
 }
 
@@ -30,6 +31,7 @@ export default function TemplateCard({ template }: TemplateCardProps) {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
   const addToCart = () => {
     if (!isAuthenticated) {
@@ -86,67 +88,117 @@ export default function TemplateCard({ template }: TemplateCardProps) {
     }
   };
 
+  const toggleLike = () => {
+    setIsLiked(!isLiked);
+    toast({
+      title: isLiked ? "Removed from Wishlist" : "Added to Wishlist",
+      description: isLiked 
+        ? `${template.name} removed from your wishlist` 
+        : `${template.name} added to your wishlist`,
+    });
+  };
+
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-      <Link href={`/template/${template.slug}`}>
-        <div className="relative cursor-pointer">
+    <div className="template-card-premium group">
+      {/* Image Container with Hover Effects */}
+      <div className="image-container relative">
+        <Link href={`/template/${template.slug}`}>
           <img 
-            src={template.previewImages?.[0] || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop"}
+            src={template.previewImages?.[0] || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop"}
             alt={`${template.name} preview`}
-            className="w-full h-48 object-cover"
+            className="w-full h-56 object-cover cursor-pointer"
             data-testid={`img-template-preview-${template.id}`}
           />
-          <div className="absolute top-4 right-4">
-            <Badge variant="secondary" data-testid={`badge-price-${template.id}`}>
-              ${template.price}
-            </Badge>
+        </Link>
+        
+        {/* Overlay with Actions */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+          <div className="flex gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+            <Button 
+              size="sm" 
+              className="bg-white/20 backdrop-blur-sm border-white/20 text-white hover:bg-white/30"
+              onClick={handlePreview}
+            >
+              <Eye className="w-4 h-4" />
+            </Button>
+            <Button 
+              size="sm" 
+              className="bg-white/20 backdrop-blur-sm border-white/20 text-white hover:bg-white/30"
+              onClick={toggleLike}
+            >
+              <Heart className={`w-4 h-4 ${isLiked ? 'fill-current text-red-400' : ''}`} />
+            </Button>
           </div>
         </div>
-      </Link>
+        
+        {/* Price Badge */}
+        <div className="absolute top-4 right-4">
+          <span className="badge-price">
+            ${template.price}
+          </span>
+        </div>
+        
+        {/* Download Count */}
+        {template.downloads && template.downloads > 0 && (
+          <div className="absolute top-4 left-4">
+            <div className="flex items-center gap-1 px-2 py-1 bg-black/50 backdrop-blur-sm rounded-full text-white text-xs">
+              <Download className="w-3 h-3" />
+              <span>{template.downloads}</span>
+            </div>
+          </div>
+        )}
+      </div>
       
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-3">
+      {/* Content */}
+      <div className="p-6 space-y-4">
+        {/* Title and Rating */}
+        <div className="space-y-2">
           <Link href={`/template/${template.slug}`}>
-            <h3 className="font-bold text-lg cursor-pointer hover:text-primary" data-testid={`text-template-name-${template.id}`}>
+            <h3 className="font-bold text-lg text-white cursor-pointer hover:text-violet-300 transition-colors line-clamp-1" data-testid={`text-template-name-${template.id}`}>
               {template.name}
             </h3>
           </Link>
-          <div className="flex items-center">
-            <div className="flex text-yellow-400 mr-1">
+          
+          {/* Rating */}
+          <div className="flex items-center justify-between">
+            <div className="rating-stars">
               {Array.from({ length: 5 }, (_, i) => (
                 <Star 
                   key={i} 
-                  className={`w-4 h-4 ${i < Math.floor(template.avgRating || 0) ? 'fill-current' : ''}`}
+                  className={`rating-star ${i < Math.floor(template.avgRating || 0) ? '' : 'empty'}`}
                 />
               ))}
+              <span className="text-sm text-white/60 ml-2" data-testid={`text-rating-${template.id}`}>
+                {template.avgRating ? template.avgRating.toFixed(1) : '0.0'} ({template.reviewCount || 0})
+              </span>
             </div>
-            <span className="text-sm text-muted-foreground" data-testid={`text-rating-${template.id}`}>
-              {template.avgRating ? template.avgRating.toFixed(1) : '0.0'} ({template.reviewCount || 0})
-            </span>
           </div>
         </div>
         
-        <p className="text-muted-foreground mb-4 text-sm" data-testid={`text-template-description-${template.id}`}>
+        {/* Description */}
+        <p className="text-white/70 text-sm line-clamp-2 leading-relaxed" data-testid={`text-template-description-${template.id}`}>
           {template.shortDescription || template.description}
         </p>
         
-        <div className="flex flex-wrap gap-2 mb-4">
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2">
           {template.category && (
-            <Badge variant="outline" className="text-xs">
+            <span className="badge-premium">
               {template.category.name}
-            </Badge>
+            </span>
           )}
           {template.tags?.slice(0, 2).map((tag: string) => (
-            <Badge key={tag} variant="outline" className="text-xs">
+            <span key={tag} className="badge-premium">
               {tag}
-            </Badge>
+            </span>
           ))}
         </div>
         
-        <div className="flex space-x-2">
+        {/* Action Buttons */}
+        <div className="flex gap-2">
           <Button 
-            variant="outline" 
-            size="sm" 
+            className="btn-secondary-premium flex-1 text-sm" 
+            size="sm"
             onClick={handlePreview}
             data-testid={`button-preview-${template.id}`}
           >
@@ -154,16 +206,31 @@ export default function TemplateCard({ template }: TemplateCardProps) {
             Preview
           </Button>
           <Button 
-            size="sm" 
+            className="btn-premium flex-1 text-sm" 
+            size="sm"
             onClick={addToCart}
             disabled={isAddingToCart}
             data-testid={`button-add-cart-${template.id}`}
           >
-            <ShoppingCart className="w-4 h-4 mr-1" />
-            {isAddingToCart ? "Adding..." : "Add to Cart"}
+            {isAddingToCart ? (
+              <>
+                <Sparkles className="w-4 h-4 mr-1 animate-spin" />
+                Adding...
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="w-4 h-4 mr-1" />
+                Add to Cart
+              </>
+            )}
           </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      
+      {/* Hover Glow Effect */}
+      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-violet-500/10 via-transparent to-indigo-500/10"></div>
+      </div>
+    </div>
   );
 }
