@@ -106,6 +106,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/templates/best-selling', async (req, res) => {
+    try {
+      const templates = await storage.getBestSellingTemplates();
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching best selling templates:", error);
+      res.status(500).json({ message: "Failed to fetch best selling templates" });
+    }
+  });
+
+  app.get('/api/templates/latest', async (req, res) => {
+    try {
+      const templates = await storage.getLatestTemplates();
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching latest templates:", error);
+      res.status(500).json({ message: "Failed to fetch latest templates" });
+    }
+  });
+
+  app.get('/api/templates/trending', async (req, res) => {
+    try {
+      const templates = await storage.getTrendingTemplates();
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching trending templates:", error);
+      res.status(500).json({ message: "Failed to fetch trending templates" });
+    }
+  });
+
+  app.get('/api/templates/discount', async (req, res) => {
+    try {
+      const templates = await storage.getDiscountTemplates();
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching discount templates:", error);
+      res.status(500).json({ message: "Failed to fetch discount templates" });
+    }
+  });
+
+  app.get('/api/templates/favorites', async (req, res) => {
+    try {
+      const templates = await storage.getCustomerFavorites();
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching customer favorites:", error);
+      res.status(500).json({ message: "Failed to fetch customer favorites" });
+    }
+  });
+
+  app.get('/api/templates/category/:categoryId', async (req, res) => {
+    try {
+      const { categoryId } = req.params;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 6;
+      const templates = await storage.getTemplatesByCategory(categoryId, limit);
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching templates by category:", error);
+      res.status(500).json({ message: "Failed to fetch templates by category" });
+    }
+  });
+
   app.get('/api/templates/:id', async (req, res) => {
     try {
       const template = await storage.getTemplate(req.params.id);

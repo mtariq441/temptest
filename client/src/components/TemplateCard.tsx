@@ -13,16 +13,16 @@ interface TemplateCardProps {
     name: string;
     slug: string;
     description: string;
-    shortDescription?: string;
+    shortDescription?: string | null;
     price: string;
-    previewImages?: string[];
-    tags?: string[];
+    previewImages?: string[] | null;
+    tags?: string[] | null;
     category?: {
       name: string;
     };
     avgRating?: number;
     reviewCount?: number;
-    demoUrl?: string;
+    demoUrl?: string | null;
   };
 }
 

@@ -19,7 +19,7 @@ import {
   type InsertReview,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, ilike, and, sql, avg, count } from "drizzle-orm";
+import { eq, desc, asc, ilike, and, sql, avg, count, gte } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
@@ -41,6 +41,12 @@ export interface IStorage {
     sortBy?: 'price_asc' | 'price_desc' | 'newest' | 'popular' | 'rating';
   }): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]>;
   getFeaturedTemplates(): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]>;
+  getBestSellingTemplates(): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]>;
+  getLatestTemplates(): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]>;
+  getTrendingTemplates(): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]>;
+  getDiscountTemplates(): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]>;
+  getCustomerFavorites(): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]>;
+  getTemplatesByCategory(categoryId: string, limit?: number): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]>;
   getTemplate(id: string): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number }) | undefined>;
   getTemplateBySlug(slug: string): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number }) | undefined>;
   createTemplate(template: InsertTemplate): Promise<Template>;
@@ -204,6 +210,154 @@ export class DatabaseStorage implements IStorage {
       .groupBy(templates.id, categories.id)
       .orderBy(desc(templates.createdAt))
       .limit(6);
+
+    return results.map(r => ({
+      ...r.template,
+      category: r.category || undefined,
+      avgRating: r.avgRating ? Number(r.avgRating) : undefined,
+      reviewCount: r.reviewCount ? Number(r.reviewCount) : 0,
+    }));
+  }
+
+  async getBestSellingTemplates(): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]> {
+    const results = await db
+      .select({
+        template: templates,
+        category: categories,
+        avgRating: avg(reviews.rating),
+        reviewCount: count(reviews.id),
+      })
+      .from(templates)
+      .leftJoin(categories, eq(templates.categoryId, categories.id))
+      .leftJoin(reviews, eq(templates.id, reviews.templateId))
+      .where(eq(templates.isActive, true))
+      .groupBy(templates.id, categories.id)
+      .orderBy(desc(templates.downloads))
+      .limit(6);
+
+    return results.map(r => ({
+      ...r.template,
+      category: r.category || undefined,
+      avgRating: r.avgRating ? Number(r.avgRating) : undefined,
+      reviewCount: r.reviewCount ? Number(r.reviewCount) : 0,
+    }));
+  }
+
+  async getLatestTemplates(): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]> {
+    const results = await db
+      .select({
+        template: templates,
+        category: categories,
+        avgRating: avg(reviews.rating),
+        reviewCount: count(reviews.id),
+      })
+      .from(templates)
+      .leftJoin(categories, eq(templates.categoryId, categories.id))
+      .leftJoin(reviews, eq(templates.id, reviews.templateId))
+      .where(eq(templates.isActive, true))
+      .groupBy(templates.id, categories.id)
+      .orderBy(desc(templates.createdAt))
+      .limit(6);
+
+    return results.map(r => ({
+      ...r.template,
+      category: r.category || undefined,
+      avgRating: r.avgRating ? Number(r.avgRating) : undefined,
+      reviewCount: r.reviewCount ? Number(r.reviewCount) : 0,
+    }));
+  }
+
+  async getTrendingTemplates(): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]> {
+    // Trending based on recent downloads and high ratings
+    const results = await db
+      .select({
+        template: templates,
+        category: categories,
+        avgRating: avg(reviews.rating),
+        reviewCount: count(reviews.id),
+      })
+      .from(templates)
+      .leftJoin(categories, eq(templates.categoryId, categories.id))
+      .leftJoin(reviews, eq(templates.id, reviews.templateId))
+      .where(eq(templates.isActive, true))
+      .groupBy(templates.id, categories.id)
+      .having(sql`COUNT(${reviews.id}) > 0 AND AVG(${reviews.rating}) >= 4`)
+      .orderBy(desc(sql`${templates.downloads} * AVG(${reviews.rating})`))
+      .limit(6);
+
+    return results.map(r => ({
+      ...r.template,
+      category: r.category || undefined,
+      avgRating: r.avgRating ? Number(r.avgRating) : undefined,
+      reviewCount: r.reviewCount ? Number(r.reviewCount) : 0,
+    }));
+  }
+
+  async getDiscountTemplates(): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]> {
+    // For now, return templates with lower prices as "discount" templates
+    const results = await db
+      .select({
+        template: templates,
+        category: categories,
+        avgRating: avg(reviews.rating),
+        reviewCount: count(reviews.id),
+      })
+      .from(templates)
+      .leftJoin(categories, eq(templates.categoryId, categories.id))
+      .leftJoin(reviews, eq(templates.id, reviews.templateId))
+      .where(and(eq(templates.isActive, true), sql`${templates.price}::numeric < 50`))
+      .groupBy(templates.id, categories.id)
+      .orderBy(asc(templates.price))
+      .limit(6);
+
+    return results.map(r => ({
+      ...r.template,
+      category: r.category || undefined,
+      avgRating: r.avgRating ? Number(r.avgRating) : undefined,
+      reviewCount: r.reviewCount ? Number(r.reviewCount) : 0,
+    }));
+  }
+
+  async getCustomerFavorites(): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]> {
+    const results = await db
+      .select({
+        template: templates,
+        category: categories,
+        avgRating: avg(reviews.rating),
+        reviewCount: count(reviews.id),
+      })
+      .from(templates)
+      .leftJoin(categories, eq(templates.categoryId, categories.id))
+      .leftJoin(reviews, eq(templates.id, reviews.templateId))
+      .where(eq(templates.isActive, true))
+      .groupBy(templates.id, categories.id)
+      .having(sql`COUNT(${reviews.id}) > 0`)
+      .orderBy(desc(avg(reviews.rating)))
+      .limit(6);
+
+    return results.map(r => ({
+      ...r.template,
+      category: r.category || undefined,
+      avgRating: r.avgRating ? Number(r.avgRating) : undefined,
+      reviewCount: r.reviewCount ? Number(r.reviewCount) : 0,
+    }));
+  }
+
+  async getTemplatesByCategory(categoryId: string, limit: number = 6): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]> {
+    const results = await db
+      .select({
+        template: templates,
+        category: categories,
+        avgRating: avg(reviews.rating),
+        reviewCount: count(reviews.id),
+      })
+      .from(templates)
+      .leftJoin(categories, eq(templates.categoryId, categories.id))
+      .leftJoin(reviews, eq(templates.id, reviews.templateId))
+      .where(and(eq(templates.isActive, true), eq(templates.categoryId, categoryId)))
+      .groupBy(templates.id, categories.id)
+      .orderBy(desc(templates.createdAt))
+      .limit(limit);
 
     return results.map(r => ({
       ...r.template,

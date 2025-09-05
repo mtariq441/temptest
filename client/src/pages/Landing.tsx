@@ -1,198 +1,340 @@
 import { Link } from "wouter";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import TemplateCard from "@/components/TemplateCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, ShoppingCart, Eye } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Star, Search, ArrowRight, Tag, TrendingUp, Clock, Heart, Percent } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import type { Template, Category } from "@shared/schema";
 
+type TemplateWithExtras = Template & { 
+  category?: Category; 
+  avgRating?: number; 
+  reviewCount?: number 
+};
+
 export default function Landing() {
-  const { data: featuredTemplates = [] } = useQuery<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]>({
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Fetch all template sections
+  const { data: featuredTemplates = [] } = useQuery<TemplateWithExtras[]>({
     queryKey: ["/api/templates/featured"],
+  });
+
+  const { data: bestSellingTemplates = [] } = useQuery<TemplateWithExtras[]>({
+    queryKey: ["/api/templates/best-selling"],
+  });
+
+  const { data: latestTemplates = [] } = useQuery<TemplateWithExtras[]>({
+    queryKey: ["/api/templates/latest"],
+  });
+
+  const { data: trendingTemplates = [] } = useQuery<TemplateWithExtras[]>({
+    queryKey: ["/api/templates/trending"],
+  });
+
+  const { data: discountTemplates = [] } = useQuery<TemplateWithExtras[]>({
+    queryKey: ["/api/templates/discount"],
+  });
+
+  const { data: customerFavorites = [] } = useQuery<TemplateWithExtras[]>({
+    queryKey: ["/api/templates/favorites"],
   });
 
   const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
   });
 
+  // Featured template for hero banner (use first featured template)
+  const heroTemplate = featuredTemplates[0];
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/templates?search=${encodeURIComponent(searchQuery.trim())}`;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary to-accent text-primary-foreground py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6" data-testid="hero-title">
-            Premium Website Templates
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-2xl mx-auto" data-testid="hero-description">
-            Discover professionally crafted templates for your next project. Modern designs that convert visitors into customers.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/api/login">
-              <Button 
-                size="lg" 
-                className="bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-3 text-lg"
-                data-testid="button-browse-templates"
-              >
-                Browse Templates
-              </Button>
-            </Link>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary px-8 py-3 text-lg"
-              data-testid="button-learn-more"
-            >
-              Learn More
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Categories */}
-      <section className="py-16 bg-muted/50">
+      {/* Hero Banner - Large Featured Template Slider */}
+      <section className="relative bg-gradient-to-br from-primary/10 to-accent/10 py-20 overflow-hidden">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12" data-testid="text-categories-title">Popular Categories</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {categories.map((category) => (
-              <Card key={category.id} className="hover:shadow-md transition-shadow cursor-pointer text-center">
-                <CardContent className="p-6">
-                  <div className="text-3xl text-primary mb-4" data-testid={`icon-category-${category.id}`}>
-                    {category.icon ? (
-                      <i className={category.icon}></i>
-                    ) : (
-                      <i className="fas fa-laptop-code"></i>
-                    )}
-                  </div>
-                  <h3 className="font-semibold mb-2" data-testid={`text-category-name-${category.id}`}>
-                    {category.name}
-                  </h3>
-                  <p className="text-muted-foreground text-sm" data-testid={`text-category-description-${category.id}`}>
-                    {category.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <Badge variant="secondary" className="w-fit">
+                <Star className="w-4 h-4 mr-2 fill-current text-yellow-500" />
+                Featured Template
+              </Badge>
+              <h1 className="text-4xl md:text-6xl font-bold leading-tight">
+                {heroTemplate ? (
+                  <>Premium <span className="text-primary">{heroTemplate.name}</span> Template</>
+                ) : (
+                  <>Premium <span className="text-primary">Website</span> Templates</>
+                )}
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-lg">
+                {heroTemplate?.description || "Discover professionally crafted templates for your next project. Modern designs that convert visitors into customers."}
+              </p>
+              
+              {/* Search Bar */}
+              <form onSubmit={handleSearch} className="flex gap-2 max-w-lg">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    type="text"
+                    placeholder="Search templates, categories, tags..."
+                    className="pl-10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <Button type="submit">Search</Button>
+              </form>
 
-      {/* Featured Templates */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 sm:mb-0" data-testid="text-featured-title">Featured Templates</h2>
-            <Link href="/api/login">
-              <Button variant="link" className="text-primary font-semibold p-0" data-testid="link-view-all">
-                View All Templates <i className="fas fa-arrow-right ml-1"></i>
-              </Button>
-            </Link>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredTemplates.map((template) => (
-              <Card key={template.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                <div className="relative">
+              {heroTemplate && (
+                <div className="flex gap-4 pt-4">
+                  <Button size="lg" className="px-8">
+                    <Link href={heroTemplate.demoUrl || "#"}>
+                      View Demo
+                    </Link>
+                  </Button>
+                  <Button size="lg" variant="outline" className="px-8">
+                    Buy Now - ${heroTemplate.price}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {heroTemplate && (
+              <div className="relative">
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                   <img 
-                    src={template.previewImages?.[0] || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop"}
-                    alt={`${template.name} preview`}
-                    className="w-full h-48 object-cover"
-                    data-testid={`img-template-preview-${template.id}`}
+                    src={heroTemplate.previewImages?.[0] || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop"}
+                    alt={heroTemplate.name}
+                    className="w-full h-96 object-cover"
                   />
                   <div className="absolute top-4 right-4">
-                    <Badge variant="secondary" data-testid={`badge-price-${template.id}`}>
-                      ${template.price}
+                    <Badge className="bg-green-500 text-white">
+                      ${heroTemplate.price}
                     </Badge>
                   </div>
                 </div>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-bold text-lg" data-testid={`text-template-name-${template.id}`}>
-                      {template.name}
-                    </h3>
-                    <div className="flex items-center">
-                      <div className="flex text-yellow-400 mr-1">
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <Star 
-                            key={i} 
-                            className={`w-4 h-4 ${i < Math.floor(template.avgRating || 0) ? 'fill-current' : ''}`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-sm text-muted-foreground" data-testid={`text-rating-${template.id}`}>
-                        {template.avgRating ? template.avgRating.toFixed(1) : '0.0'} ({template.reviewCount || 0})
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground mb-4" data-testid={`text-template-description-${template.id}`}>
-                    {template.shortDescription || template.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {template.tags?.slice(0, 3).map((tag: string) => (
-                      <Badge key={tag} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" data-testid={`button-preview-${template.id}`}>
-                      <Eye className="w-4 h-4 mr-1" />
-                      Preview
-                    </Button>
-                    <Link href="/api/login">
-                      <Button size="sm" data-testid={`button-add-cart-${template.id}`}>
-                        <ShoppingCart className="w-4 h-4 mr-1" />
-                        Add to Cart
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Why Choose Us Section */}
-      <section className="py-16 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12" data-testid="text-why-choose-title">Why Choose TemplateHub?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-primary text-primary-foreground w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-award text-2xl"></i>
+      {/* Featured Templates Section */}
+      {featuredTemplates.length > 0 && (
+        <section className="py-16 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center mb-8">
+              <div className="flex items-center gap-3">
+                <Star className="w-6 h-6 text-yellow-500 fill-current" />
+                <h2 className="text-3xl font-bold">Featured Templates</h2>
               </div>
-              <h3 className="font-bold text-xl mb-3" data-testid="text-quality-title">Premium Quality</h3>
-              <p className="text-muted-foreground" data-testid="text-quality-description">
-                Hand-crafted templates designed by professionals with attention to detail and modern standards.
-              </p>
+              <Link href="/templates?featured=true">
+                <Button variant="ghost" className="flex items-center gap-2">
+                  View All <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
             </div>
-            <div className="text-center">
-              <div className="bg-accent text-accent-foreground w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-mobile-alt text-2xl"></i>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredTemplates.map((template) => (
+                <TemplateCard key={template.id} template={template} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Best Selling Templates Section */}
+      {bestSellingTemplates.length > 0 && (
+        <section className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center mb-8">
+              <div className="flex items-center gap-3">
+                <TrendingUp className="w-6 h-6 text-green-500" />
+                <h2 className="text-3xl font-bold">Best Selling Templates</h2>
               </div>
-              <h3 className="font-bold text-xl mb-3" data-testid="text-responsive-title">Fully Responsive</h3>
-              <p className="text-muted-foreground" data-testid="text-responsive-description">
-                All templates are optimized for mobile, tablet, and desktop devices with perfect responsiveness.
-              </p>
+              <Link href="/templates?sort=popular">
+                <Button variant="ghost" className="flex items-center gap-2">
+                  View All <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
             </div>
-            <div className="text-center">
-              <div className="bg-secondary text-secondary-foreground w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-headset text-2xl"></i>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {bestSellingTemplates.map((template) => (
+                <TemplateCard key={template.id} template={template} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Latest Templates Section */}
+      {latestTemplates.length > 0 && (
+        <section className="py-16 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center mb-8">
+              <div className="flex items-center gap-3">
+                <Clock className="w-6 h-6 text-blue-500" />
+                <h2 className="text-3xl font-bold">Latest Templates</h2>
               </div>
-              <h3 className="font-bold text-xl mb-3" data-testid="text-support-title">24/7 Support</h3>
-              <p className="text-muted-foreground" data-testid="text-support-description">
-                Get help when you need it with our dedicated customer support team available around the clock.
-              </p>
+              <Link href="/templates?sort=newest">
+                <Button variant="ghost" className="flex items-center gap-2">
+                  View All <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {latestTemplates.map((template) => (
+                <TemplateCard key={template.id} template={template} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Category Sections */}
+      {categories.map((category) => (
+        <CategorySection key={category.id} category={category} />
+      ))}
+
+      {/* Trending Templates Section */}
+      {trendingTemplates.length > 0 && (
+        <section className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center mb-8">
+              <div className="flex items-center gap-3">
+                <TrendingUp className="w-6 h-6 text-purple-500" />
+                <h2 className="text-3xl font-bold">Trending Templates</h2>
+              </div>
+              <Link href="/templates?sort=rating">
+                <Button variant="ghost" className="flex items-center gap-2">
+                  View All <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {trendingTemplates.map((template) => (
+                <TemplateCard key={template.id} template={template} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Discount Templates Section */}
+      {discountTemplates.length > 0 && (
+        <section className="py-16 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center mb-8">
+              <div className="flex items-center gap-3">
+                <Percent className="w-6 h-6 text-red-500" />
+                <h2 className="text-3xl font-bold">Special Offers</h2>
+              </div>
+              <Link href="/templates?discount=true">
+                <Button variant="ghost" className="flex items-center gap-2">
+                  View All <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {discountTemplates.map((template) => (
+                <TemplateCard key={template.id} template={template} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Customer Favorites Section */}
+      {customerFavorites.length > 0 && (
+        <section className="py-16 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center mb-8">
+              <div className="flex items-center gap-3">
+                <Heart className="w-6 h-6 text-red-500 fill-current" />
+                <h2 className="text-3xl font-bold">Customer Favorites</h2>
+              </div>
+              <Link href="/templates?sort=rating">
+                <Button variant="ghost" className="flex items-center gap-2">
+                  View All <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {customerFavorites.map((template) => (
+                <TemplateCard key={template.id} template={template} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Newsletter CTA */}
+      <section className="py-16 bg-primary text-primary-foreground">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
+          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+            Get notified about new template releases, special offers, and design trends.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+            <Input 
+              type="email" 
+              placeholder="Enter your email"
+              className="bg-white text-black"
+            />
+            <Button variant="secondary" className="px-8">
+              Subscribe
+            </Button>
           </div>
         </div>
       </section>
 
       <Footer />
     </div>
+  );
+}
+
+// Category Section Component
+function CategorySection({ category }: { category: Category }) {
+  const { data: templates = [] } = useQuery<TemplateWithExtras[]>({
+    queryKey: [`/api/templates/category/${category.id}`],
+    enabled: !!category.id,
+  });
+
+  if (templates.length === 0) return null;
+
+  return (
+    <section className="py-16 bg-muted/20">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center gap-3">
+            <Tag className="w-6 h-6 text-primary" />
+            <h2 className="text-3xl font-bold">{category.name} Templates</h2>
+          </div>
+          <Link href={`/templates?category=${category.id}`}>
+            <Button variant="ghost" className="flex items-center gap-2">
+              View All <ArrowRight className="w-4 h-4" />
+            </Button>
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {templates.map((template) => (
+            <TemplateCard key={template.id} template={template} />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
