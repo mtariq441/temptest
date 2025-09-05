@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import multer from "multer";
@@ -12,7 +13,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-08-27.basil",
 });
 
 // Configure multer for file uploads
@@ -286,9 +287,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Increment download counts for purchased templates
         for (const item of order.items) {
-          await storage.updateTemplate(item.templateId, {
-            downloads: (item.template.downloads || 0) + 1,
-          });
+          if (item.templateId) {
+            await storage.updateTemplate(item.templateId, {
+              downloads: (item.template.downloads || 0) + 1,
+            });
+          }
         }
 
         res.json({ success: true, message: "Payment confirmed" });

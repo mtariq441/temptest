@@ -124,20 +124,7 @@ export class DatabaseStorage implements IStorage {
     maxPrice?: number;
     sortBy?: 'price_asc' | 'price_desc' | 'newest' | 'popular' | 'rating';
   }): Promise<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]> {
-    let query = db
-      .select({
-        template: templates,
-        category: categories,
-        avgRating: avg(reviews.rating),
-        reviewCount: count(reviews.id),
-      })
-      .from(templates)
-      .leftJoin(categories, eq(templates.categoryId, categories.id))
-      .leftJoin(reviews, eq(templates.id, reviews.templateId))
-      .where(eq(templates.isActive, true))
-      .groupBy(templates.id, categories.id);
-
-    // Apply filters
+    // Build conditions
     const conditions = [eq(templates.isActive, true)];
 
     if (filters?.categoryId) {
@@ -158,32 +145,42 @@ export class DatabaseStorage implements IStorage {
       conditions.push(sql`${templates.price} <= ${filters.maxPrice}`);
     }
 
-    if (conditions.length > 1) {
-      query = query.where(and(...conditions));
-    }
-
-    // Apply sorting
+    // Build ordering
+    let orderByClause;
     switch (filters?.sortBy) {
       case 'price_asc':
-        query = query.orderBy(asc(templates.price));
+        orderByClause = asc(templates.price);
         break;
       case 'price_desc':
-        query = query.orderBy(desc(templates.price));
+        orderByClause = desc(templates.price);
         break;
       case 'newest':
-        query = query.orderBy(desc(templates.createdAt));
+        orderByClause = desc(templates.createdAt);
         break;
       case 'popular':
-        query = query.orderBy(desc(templates.downloads));
+        orderByClause = desc(templates.downloads);
         break;
       case 'rating':
-        query = query.orderBy(desc(avg(reviews.rating)));
+        orderByClause = desc(avg(reviews.rating));
         break;
       default:
-        query = query.orderBy(desc(templates.createdAt));
+        orderByClause = desc(templates.createdAt);
     }
 
-    const results = await query;
+    const results = await db
+      .select({
+        template: templates,
+        category: categories,
+        avgRating: avg(reviews.rating),
+        reviewCount: count(reviews.id),
+      })
+      .from(templates)
+      .leftJoin(categories, eq(templates.categoryId, categories.id))
+      .leftJoin(reviews, eq(templates.id, reviews.templateId))
+      .where(and(...conditions))
+      .groupBy(templates.id, categories.id)
+      .orderBy(orderByClause);
+
     return results.map(r => ({
       ...r.template,
       category: r.category || undefined,

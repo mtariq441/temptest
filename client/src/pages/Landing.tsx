@@ -6,13 +6,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, ShoppingCart, Eye } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import type { Template, Category } from "@shared/schema";
 
 export default function Landing() {
-  const { data: featuredTemplates = [] } = useQuery({
+  const { data: featuredTemplates = [] } = useQuery<(Template & { category?: Category; avgRating?: number; reviewCount?: number })[]>({
     queryKey: ["/api/templates/featured"],
   });
 
-  const { data: categories = [] } = useQuery({
+  const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
   });
 
@@ -56,7 +57,7 @@ export default function Landing() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12" data-testid="text-categories-title">Popular Categories</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {categories.map((category: any) => (
+            {categories.map((category) => (
               <Card key={category.id} className="hover:shadow-md transition-shadow cursor-pointer text-center">
                 <CardContent className="p-6">
                   <div className="text-3xl text-primary mb-4" data-testid={`icon-category-${category.id}`}>
@@ -92,7 +93,7 @@ export default function Landing() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredTemplates.map((template: any) => (
+            {featuredTemplates.map((template) => (
               <Card key={template.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 <div className="relative">
                   <img 

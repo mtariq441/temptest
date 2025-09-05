@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import type { Category } from "@shared/schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { 
@@ -23,7 +24,7 @@ interface SearchFiltersProps {
 }
 
 export default function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) {
-  const { data: categories = [] } = useQuery({
+  const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
   });
 
@@ -77,7 +78,7 @@ export default function SearchFilters({ filters, onFiltersChange }: SearchFilter
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">All Categories</SelectItem>
-                {categories.map((category: any) => (
+                {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
                   </SelectItem>
