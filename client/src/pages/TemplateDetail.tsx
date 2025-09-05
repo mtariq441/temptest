@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
+import type { Template, Review } from "@shared/schema";
 
 export default function TemplateDetail() {
   const { slug } = useParams() as { slug: string };
@@ -31,12 +32,12 @@ export default function TemplateDetail() {
     },
   });
 
-  const { data: reviews = [] } = useQuery({
+  const { data: reviews = [] } = useQuery<Review[]>({
     queryKey: ["/api/templates", template?.id, "reviews"],
     enabled: !!template?.id,
   });
 
-  const { data: purchases = [] } = useQuery({
+  const { data: purchases = [] } = useQuery<Template[]>({
     queryKey: ["/api/my-purchases"],
     enabled: !!user,
   });
@@ -124,7 +125,7 @@ export default function TemplateDetail() {
     );
   }
 
-  const isPurchased = purchases.some((p: any) => p.id === template.id);
+  const isPurchased = purchases.some((p) => p.id === template.id);
 
   return (
     <div className="min-h-screen bg-background">

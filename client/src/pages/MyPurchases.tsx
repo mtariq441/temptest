@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Calendar } from "lucide-react";
+import type { Template, Order } from "@shared/schema";
 
 export default function MyPurchases() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -27,8 +28,6 @@ export default function MyPurchases() {
       return;
     }
   }, [isAuthenticated, isLoading, toast]);
-
-import type { Template, Order } from "@shared/schema";
 
   const { data: purchases = [], isLoading: purchasesLoading } = useQuery<Template[]>({
     queryKey: ["/api/my-purchases"],
@@ -131,7 +130,7 @@ import type { Template, Order } from "@shared/schema";
                       <div className="flex space-x-2">
                         <Button 
                           className="flex-1"
-                          onClick={() => window.open(template.downloadUrl, '_blank')}
+                          onClick={() => window.open(template.downloadUrl || '', '_blank')}
                           data-testid={`button-download-${template.id}`}
                         >
                           <Download className="w-4 h-4 mr-2" />
@@ -140,7 +139,7 @@ import type { Template, Order } from "@shared/schema";
                         {template.demoUrl && (
                           <Button 
                             variant="outline" 
-                            onClick={() => window.open(template.demoUrl, '_blank')}
+                            onClick={() => window.open(template.demoUrl || '', '_blank')}
                             data-testid={`button-preview-${template.id}`}
                           >
                             Preview
@@ -157,7 +156,7 @@ import type { Template, Order } from "@shared/schema";
             <div>
               <h2 className="text-2xl font-bold mb-6">Order History</h2>
               <div className="space-y-4">
-                {orders.map((order: any) => (
+                {orders.map((order) => (
                   <Card key={order.id}>
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between mb-4">
@@ -169,7 +168,7 @@ import type { Template, Order } from "@shared/schema";
                             <div className="flex items-center text-sm text-muted-foreground">
                               <Calendar className="w-4 h-4 mr-1" />
                               <span data-testid={`text-order-date-${order.id}`}>
-                                {new Date(order.createdAt).toLocaleDateString()}
+                                {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
                               </span>
                             </div>
                           </div>

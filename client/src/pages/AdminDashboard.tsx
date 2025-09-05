@@ -18,6 +18,7 @@ import {
   Plus,
   TrendingUp,
 } from "lucide-react";
+import type { Template, Order } from "@shared/schema";
 
 export default function AdminDashboard() {
   const { user, isLoading, isAuthenticated } = useAuth();
@@ -39,19 +40,29 @@ export default function AdminDashboard() {
     }
   }, [isAuthenticated, isLoading, user, toast]);
 
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats = {
+    totalRevenue: 0,
+    totalOrders: 0,
+    totalTemplates: 0,
+    totalUsers: 0
+  }, isLoading: statsLoading } = useQuery<{
+    totalRevenue: number;
+    totalOrders: number;
+    totalTemplates: number;
+    totalUsers: number;
+  }>({
     queryKey: ["/api/admin/stats"],
     enabled: !!user?.isAdmin,
     retry: false,
   });
 
-  const { data: recentOrders = [], isLoading: ordersLoading } = useQuery({
+  const { data: recentOrders = [], isLoading: ordersLoading } = useQuery<Order[]>({
     queryKey: ["/api/admin/recent-orders"],
     enabled: !!user?.isAdmin,
     retry: false,
   });
 
-  const { data: templates = [] } = useQuery({
+  const { data: templates = [] } = useQuery<Template[]>({
     queryKey: ["/api/templates"],
     enabled: !!user?.isAdmin,
   });
@@ -96,7 +107,7 @@ export default function AdminDashboard() {
                 <div>
                   <p className="text-sm text-muted-foreground">Total Revenue</p>
                   <p className="text-2xl font-bold" data-testid="text-total-revenue">
-                    ${statsLoading ? "..." : stats?.totalRevenue.toLocaleString() || "0"}
+                    ${statsLoading ? "..." : stats?.totalRevenue?.toLocaleString() || "0"}
                   </p>
                 </div>
                 <div className="bg-primary text-primary-foreground p-3 rounded-lg">
@@ -112,7 +123,7 @@ export default function AdminDashboard() {
                 <div>
                   <p className="text-sm text-muted-foreground">Total Orders</p>
                   <p className="text-2xl font-bold" data-testid="text-total-orders">
-                    {statsLoading ? "..." : stats?.totalOrders.toLocaleString() || "0"}
+                    {statsLoading ? "..." : stats?.totalOrders?.toLocaleString() || "0"}
                   </p>
                 </div>
                 <div className="bg-accent text-accent-foreground p-3 rounded-lg">
@@ -128,7 +139,7 @@ export default function AdminDashboard() {
                 <div>
                   <p className="text-sm text-muted-foreground">Templates</p>
                   <p className="text-2xl font-bold" data-testid="text-total-templates">
-                    {statsLoading ? "..." : stats?.totalTemplates.toLocaleString() || "0"}
+                    {statsLoading ? "..." : stats?.totalTemplates?.toLocaleString() || "0"}
                   </p>
                 </div>
                 <div className="bg-secondary text-secondary-foreground p-3 rounded-lg">
@@ -144,7 +155,7 @@ export default function AdminDashboard() {
                 <div>
                   <p className="text-sm text-muted-foreground">Users</p>
                   <p className="text-2xl font-bold" data-testid="text-total-users">
-                    {statsLoading ? "..." : stats?.totalUsers.toLocaleString() || "0"}
+                    {statsLoading ? "..." : stats?.totalUsers?.toLocaleString() || "0"}
                   </p>
                 </div>
                 <div className="bg-muted text-muted-foreground p-3 rounded-lg">

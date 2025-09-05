@@ -4,7 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { X, ShoppingCart, Trash2, CreditCard } from "lucide-react";
+import { X, ShoppingCart as ShoppingCartIcon, Trash2, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -113,7 +113,7 @@ export default function ShoppingCart({ open, onClose }: ShoppingCartProps) {
         <SheetHeader className="pb-6">
           <div className="flex items-center justify-between">
             <SheetTitle className="flex items-center" data-testid="text-cart-title">
-              <ShoppingCart className="w-5 h-5 mr-2" />
+              <ShoppingCartIcon className="w-5 h-5 mr-2" />
               Shopping Cart ({cartItems.length})
             </SheetTitle>
             {cartItems.length > 0 && (
@@ -132,7 +132,7 @@ export default function ShoppingCart({ open, onClose }: ShoppingCartProps) {
 
         {cartItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 text-center">
-            <ShoppingCart className="w-16 h-16 text-muted-foreground mb-4" />
+            <ShoppingCartIcon className="w-16 h-16 text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2" data-testid="text-empty-cart">Your cart is empty</h3>
             <p className="text-muted-foreground mb-4">
               Browse our templates and add some to your cart

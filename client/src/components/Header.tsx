@@ -122,7 +122,7 @@ export default function Header() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="p-0" data-testid="button-user-menu">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.profileImageUrl} />
+                        <AvatarImage src={user.profileImageUrl || undefined} />
                         <AvatarFallback data-testid="text-user-initials">
                           {user.firstName?.[0]}{user.lastName?.[0]}
                         </AvatarFallback>
@@ -132,7 +132,7 @@ export default function Header() {
                   <DropdownMenuContent align="end" className="w-56">
                     <div className="flex items-center space-x-2 p-2">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.profileImageUrl} />
+                        <AvatarImage src={user.profileImageUrl || undefined} />
                         <AvatarFallback>
                           {user.firstName?.[0]}{user.lastName?.[0]}
                         </AvatarFallback>
